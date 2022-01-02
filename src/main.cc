@@ -48,9 +48,9 @@
 #include "system/gif.h"
 #include "system/ui/gui.h"
 
-#include "ppc_font.h"
-#include "ppc_img.h"
-#include "ppc_button_changecd.h"
+#include "resources/ppc_font.h"
+#include "resources/ppc_img.h"
+#include "resources/ppc_button_changecd.h"
 
 void changeCDFunc(void *p)
 {
