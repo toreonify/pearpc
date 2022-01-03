@@ -23,49 +23,50 @@
 #include "tools/except.h"
 #include "tools/snprintf.h"
 
+// TODO: remove
 ConfigParser *gConfig;
 
-ConfigEntry::ConfigEntry(const String &aName, bool mandatory)
+ConfigEntry::ConfigEntry(const std::string name, bool mandatory)
 {
-	mName = new String(aName);
-	mMandatory = mandatory;
-	mInitialized = false;
-	mSet = false;
+	this->name = new std::string(name);
+	this->mandatory = mandatory;
+	this->initialized = false;
+	this->set = false;
 }
 
 ConfigEntry::~ConfigEntry()
 {
-	delete mName;
+	delete this->name;
 }
 
 ConfigType ConfigEntry::getType() const
 {
-	throw Exception();
+	throw MsgException("Untyped entry, cannot get type");
 }
 
 int ConfigEntry::asInt() const
 {
-	throw MsgfException("cannot interprete config entry %y as integer", mName);
+	throw MsgfException("Untyped entry, cannot be interpreted %y as Integer", this->name);
 }
 
-String &ConfigEntry::asString(String &result) const
+std::string &ConfigEntry::asString(std::string &result) const
 {
-	throw MsgfException("cannot interprete config entry %y as string", mName);
+	throw MsgfException("Untyped entry, cannot be interpreted %y as String", this->name);
 }
 
-int ConfigEntry::compareTo(const Object *obj) const
+int ConfigEntry::compareTo(const ConfigEntry *obj) const
 {
-	return mName->compareTo(((ConfigEntry *)obj)->mName);
+	return this->name->compare(*(obj->name));
 }
 
 bool ConfigEntry::isSet() const
 {
-	return mSet;
+	return this->set;
 }
 
 bool ConfigEntry::isInitialized() const
 {
-	return mInitialized;
+	return this->initialized;
 }
 	
 
@@ -73,16 +74,16 @@ class ConfigEntryInt: public ConfigEntry {
 	int value;
 public:
 
-	ConfigEntryInt(const String &aName, bool mandatory)
-		:ConfigEntry(aName, mandatory)
+	ConfigEntryInt(const std::string &name, bool mandatory)
+		:ConfigEntry(name, mandatory)
 	{
 	}
 
-	ConfigEntryInt(const String &aName, int defaultvalue, int scheiss_c_plus_plus)
-		:ConfigEntry(aName, false)
+	ConfigEntryInt(const std::string &name, int defaultValue)
+		:ConfigEntry(name, false)
 	{
-		value = defaultvalue;
-		mInitialized = true;
+		value = defaultValue;
+		initialized = true;
 	}
 	
 	virtual ConfigType getType() const
@@ -90,32 +91,37 @@ public:
 		return configTypeInt;
 	}
 	
-	void set(int v)
+	void setValue(int v)
 	{
-		value = v;
-		mInitialized = true;
-		mSet = true;
+		this->value = v;
+		this->initialized = true;
+		this->set = true;
 	}
 	
 	virtual int asInt() const
 	{
 		return value;
 	}
+	
+	virtual std::string &asString(std::string &result) const
+	{
+		throw MsgfException("ConfigEntryInt cannot be interpreted %y as String", this->name);
+	}
 };
 
 class ConfigEntryString: public ConfigEntry {
-	String value;
+	std::string value;
 public:
 
-	ConfigEntryString(const String &aName, bool mandatory)
-		:ConfigEntry(aName, mandatory)
+	ConfigEntryString(const std::string &name, bool mandatory)
+		:ConfigEntry(name, mandatory)
 	{
 	}
 	
-	ConfigEntryString(const String &aName, const String &defaultvalue)
-		: ConfigEntry(aName, false), value(defaultvalue)
+	ConfigEntryString(const std::string &name, const std::string &defaultValue)
+		: ConfigEntry(name, false), value(defaultValue)
 	{
-		mInitialized = true;
+		this->initialized = true;
 	}
 	
 	virtual ConfigType getType() const
@@ -123,19 +129,26 @@ public:
 		return configTypeString;
 	}
 	
-	void set(const String &s)
+	void setValue(const std::string &s)
 	{
-		value = s;
-		mInitialized = true;
-		mSet = true;
+		this->value = s;
+		this->initialized = true;
+		this->set = true;
 	}
 	
-	virtual String &asString(String &result) const
+	virtual std::string &asString(std::string &result) const
 	{
-		result = value;
+		result = this->value;
 		return result;
 	}
+	
+	virtual int asInt() const
+	{
+		throw MsgfException("ConfigEntryString cannot be interpreted %y as Integer", this->name);
+	}
 };
+
+
 
 ConfigParser::ConfigParser()
 {
@@ -147,31 +160,31 @@ ConfigParser::~ConfigParser()
 	delete entries;
 }
 	
-void ConfigParser::acceptConfigEntryInt(const String &mName, bool mandatory)
+void ConfigParser::acceptConfigEntryInt(const std::string &name, bool mandatory)
 {
-	ConfigEntry *entry = new ConfigEntryInt(mName, mandatory);
-	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &mName);
+	ConfigEntry *entry = new ConfigEntryInt(name, mandatory);
+	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &name);
 }
 
-void ConfigParser::acceptConfigEntryString(const String &mName, bool mandatory)
+void ConfigParser::acceptConfigEntryString(const std::string &name, bool mandatory)
 {
-	ConfigEntry *entry = new ConfigEntryString(mName, mandatory);
-	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &mName);
+	ConfigEntry *entry = new ConfigEntryString(name, mandatory);
+	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &name);
 }
 
-void ConfigParser::acceptConfigEntryIntDef(const String &mName, int d)
+void ConfigParser::acceptConfigEntryIntDef(const std::string &name, int d)
 {
-	ConfigEntry *entry = new ConfigEntryInt(mName, d, 0);
-	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &mName);
+	ConfigEntry *entry = new ConfigEntryInt(name, d);
+	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &name);
 }
 
-void ConfigParser::acceptConfigEntryStringDef(const String &mName, const String &d)
+void ConfigParser::acceptConfigEntryStringDef(const std::string &name, const std::string &d)
 {
-	ConfigEntry *entry = new ConfigEntryString(mName, d);
-	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &mName);
+	ConfigEntry *entry = new ConfigEntryString(name, d);
+	if (!entries->insert(entry)) throw MsgfException("duplicate config entry '%y'", &name);
 }
 
-bool ConfigParser::skipWhite(Stream &in)
+bool ConfigParser::skipWhite(std::istream &in)
 {
 	while (cur == ' ' || cur == '\t' || cur == '\r') {
 		if (!in.read(&cur, 1)) return false;
@@ -199,17 +212,17 @@ byte mapchar[]={
 	INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV,INV
 };
 
-void ConfigParser::loadConfig(Stream &in)
+void ConfigParser::loadConfig(std::istream &in)
 {
 	read(in);
 	foreach(ConfigEntry, e, *entries, {
-		if (e->mMandatory && !e->isInitialized()) {
-			throw MsgfException("config entry '%y' is not set.", e->mName);
+		if (e->mandatory && !e->isInitialized()) {
+			throw MsgfException("config entry '%y' is not set.", e->name);
 		}
 	});
 }
 
-void ConfigParser::read(Stream &in)
+void ConfigParser::read(std::istream &in)
 {
 	if (!in.read(&cur, 1)) return;
 	line = 1;
@@ -218,9 +231,9 @@ void ConfigParser::read(Stream &in)
 		if (cur == '#') {
 			// skip comment
 			do {
-				if (!in.read(&cur, 1)) return;				
+				if (!in.read(&cur, 1)) return;
 			} while (cur != '\n');
-			if (!in.read(&cur, 1)) return;				
+			if (!in.read(&cur, 1)) return;
 			line++;
 			continue;
 		}
@@ -229,12 +242,12 @@ void ConfigParser::read(Stream &in)
 			continue;
 		}
 		if (cur == '\n') {
-			if (!in.read(&cur, 1)) return;				
+			if (!in.read(&cur, 1)) return;
 			line++;
 			continue;
 		}
 		byte m = mapchar[cur];
-		String ident;
+		std::string ident;
 		if (m != 'A' && m != '_') throw MsgfException("invalid character '%c' (%02x) in line %d.", cur, cur, line);
 		do {
 			ident += cur;
@@ -243,8 +256,8 @@ void ConfigParser::read(Stream &in)
 		} while (m == 'A' || m == '0' || m == '_');
 		
 		ConfigEntry *e = getEntry(ident);
-		if (!e) throw MsgfException("unknown identifier '%y' in line %d.", &ident, line);
-		if (e->isSet()) throw MsgfException("config entry '%y' is already set in line %d.", e->mName, line);
+		if (!e) throw MsgfException("unknown identifier '%s' in line %d.", ident.c_str(), line);
+		if (e->isSet()) throw MsgfException("config entry '%y' is already set in line %d.", e->name, line);
 		
 		if (!skipWhite(in)) throw MsgfException("%s expected in line %d.", "'='", line);
 		if (cur != '=') throw MsgfException("%s expected in line %d.", "'='", line);
@@ -253,7 +266,7 @@ void ConfigParser::read(Stream &in)
 		
 		if (e->getType() == configTypeInt) {
 			if (m != '0') throw MsgfException("%s expected in line %d.", "integer", line);
-			String n;
+			std::string n;
 			do {
 				n += cur;
 				if (!in.read(&cur, 1)) cur = ' ';
@@ -270,12 +283,14 @@ void ConfigParser::read(Stream &in)
 					throw MsgfException("%s expected in line %d.", "integer", line);
 				}
 			}
-			uint64 u;
-			if (!n.toInt64(u)) throw MsgfException("%s expected in line %d.", "integer", line);
-			((ConfigEntryInt *)e)->set(u);
+			uint64 u = std::strtoul(n.c_str(), NULL, 10);
+			
+			//if (!n.toInt64(u)) throw MsgfException("%s expected in line %d.", "integer", line);
+			
+			((ConfigEntryInt *)e)->setValue(u);
 		} else {
 			if (m != '"') throw MsgfException("%s expected in line %d.", "'\"'", line);
-			String s;
+			std::string s;
 			int oldline = line;
 			do {
 				s += cur;
@@ -283,8 +298,8 @@ void ConfigParser::read(Stream &in)
 				m = mapchar[cur];
 				if (m == '\n') line++;
 			} while (m != '"');
-			s.del(0, 1);
-			((ConfigEntryString *)e)->set(s);
+			s.erase(0, 1);
+			((ConfigEntryString *)e)->setValue(s);
 			if (!in.read(&cur, 1)) cur = ' ';
 		}
 		if (!skipWhite(in)) return;
@@ -293,13 +308,13 @@ void ConfigParser::read(Stream &in)
 	}
 }
 
-ConfigEntry *ConfigParser::getEntry(const String &name)
+ConfigEntry *ConfigParser::getEntry(const std::string &name)
 {
 	ConfigEntry empty(name, false);
 	return (ConfigEntry *)entries->get(entries->find(&empty));
 }
 
-int ConfigParser::getConfigInt(const String &name)
+int ConfigParser::getConfigInt(const std::string &name)
 {
 	ConfigEntry empty(name, false);
 	ConfigEntry *entry = (ConfigEntry *)entries->get(entries->find(&empty));
@@ -308,7 +323,7 @@ int ConfigParser::getConfigInt(const String &name)
 	return entry->asInt();
 }
 
-String &ConfigParser::getConfigString(const String &name, String &result)
+std::string &ConfigParser::getConfigString(const std::string &name, std::string &result)
 {
 	ConfigEntry empty(name, false);
 	ConfigEntry *entry = (ConfigEntry *)entries->get(entries->find(&empty));
@@ -317,7 +332,7 @@ String &ConfigParser::getConfigString(const String &name, String &result)
 	return entry->asString(result);
 }
 
-bool ConfigParser::haveKey(const String &name)
+bool ConfigParser::haveKey(const std::string &name)
 {
 	ConfigEntry empty(name, false);
 	ConfigEntry *entry = (ConfigEntry *)entries->get(entries->find(&empty));

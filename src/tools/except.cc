@@ -37,7 +37,7 @@ Exception::~Exception()
 {
 }
 
-String &Exception::reason(String &result) const
+std::string &Exception::reason(std::string &result) const
 {
 	result = "Unknown Exception";
 	return result;
@@ -56,7 +56,7 @@ MsgException::MsgException(const char *e) throw()
 	estr[sizeof estr-1] = 0;
 }
 
-String &MsgException::reason(String &result) const
+std::string &MsgException::reason(std::string &result) const
 {
 	result = estr;
 	return result;
@@ -89,7 +89,7 @@ IOException::~IOException()
 {
 }
 
-String &IOException::reason(String &result) const
+std::string &IOException::reason(std::string &result) const
 {
 	result = "I/O error: " + errstr;
 	return result;
@@ -99,19 +99,21 @@ String &IOException::reason(String &result) const
  *	class NotImplementedException
  */
 
-NotImplementedException::NotImplementedException(const String &filename, int line_number) throw()
+NotImplementedException::NotImplementedException(const std::string &filename, int line_number) throw()
 {
 	if (line_number) {
-		location.assignFormat("%y:%d", &filename, line_number);
+		std::stringstream ss;
+		ss << filename << ":" << line_number;
+		location = ss.str();
 	} else {
 		location = filename;
 	}
 }
 
-String &NotImplementedException::reason(String &result) const
+std::string &NotImplementedException::reason(std::string &result) const
 {
 	result = "Function not implemented";
-	if (!location.isEmpty()) result += ": "+location;
+	if (!location.empty()) result += ": "+location;
 	return result;
 }
 
@@ -119,19 +121,21 @@ String &NotImplementedException::reason(String &result) const
  *	class IllegalArgumentException
  */
 
-IllegalArgumentException::IllegalArgumentException(const String &filename, int line_number) throw()
+IllegalArgumentException::IllegalArgumentException(const std::string &filename, int line_number) throw()
 {
 	if (line_number) {
-		location.assignFormat("%y:%d", &filename, line_number);
+		std::stringstream ss;
+		ss << filename << ":" << line_number;
+		location = ss.str();
 	} else {
 		location = filename;
 	}
 }
 
-String &IllegalArgumentException::reason(String &result) const
+std::string &IllegalArgumentException::reason(std::string &result) const
 {
 	result = "Illegal argument";
-	if (!location.isEmpty()) result += ": "+location;
+	if (!location.empty()) result += ": "+location;
 	return result;
 }
 
@@ -139,15 +143,17 @@ String &IllegalArgumentException::reason(String &result) const
  *	class TypeCastException
  */
 
-TypeCastException::TypeCastException(const String &cast_type, const String &obj_type) throw()
+TypeCastException::TypeCastException(const std::string &cast_type, const std::string &obj_type) throw()
 {
-	aresult.assignFormat("(%y) %y", &cast_type, &obj_type);
+	std::stringstream ss;
+	ss << "(" << cast_type << ") " << obj_type;
+	aresult = ss.str();
 }
 
-String &TypeCastException::reason(String &result) const
+std::string &TypeCastException::reason(std::string &result) const
 {
 	result = "Bad type cast";
-	if (!aresult.isEmpty()) result += ": "+aresult;
+	if (!aresult.empty()) result += ": "+aresult;
 	return result;
 }
 

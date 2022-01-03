@@ -21,57 +21,59 @@
 #ifndef __CONFIGPARSER_H__
 #define __CONFIGPARSER_H__
 
+#include <string>
+#include <iostream>
+
 #include "tools/data.h"
-#include "tools/str.h"
-#include "tools/stream.h"
 
 enum ConfigType {
-    configTypeInt,
-    configTypeString,
+	configTypeInt,
+	configTypeString,
 };
 
 class ConfigEntry: public Object {
 public:
-	String *mName;
-	bool mMandatory;
-	bool mInitialized;
-	bool mSet;
+	std::string *name;
+	bool mandatory;
+	bool initialized;
+	bool set;
 	
-			ConfigEntry(const String &aName, bool mandatory);
-	virtual 	~ConfigEntry();
+	ConfigEntry(const std::string name, bool mandatory);
+	virtual ~ConfigEntry();
+	
 	virtual int	asInt() const;
-	virtual String	&asString(String &result) const;
+	virtual std::string	&asString(std::string &result) const;
+	
 	virtual ConfigType getType() const;
-	virtual bool	isSet() const;
-	virtual bool	isInitialized() const;
-	virtual	int	compareTo(const Object *obj) const;
+	virtual bool isSet() const;
+	virtual bool isInitialized() const;
+	
+	virtual	int	compareTo(const ConfigEntry *obj) const;
 };
 
 class ConfigParser: public Object {
 	Container *entries;
-	byte cur;
+	char cur;
 	int line;
 public:
-			ConfigParser();
-	virtual		~ConfigParser();
+	ConfigParser();
+	virtual	~ConfigParser();
 
-		void	acceptConfigEntryInt(const String &mName, bool mandatory);
-		void	acceptConfigEntryString(const String &mName, bool mandatory);
-		void	acceptConfigEntryIntDef(const String &mName, int d);
-		void	acceptConfigEntryStringDef(const String &mName, const String &d);
-		void	loadConfig(Stream &in);
+	void	acceptConfigEntryInt(const std::string &name, bool mandatory);
+	void	acceptConfigEntryString(const std::string &name, bool mandatory);
+	void	acceptConfigEntryIntDef(const std::string &name, int d);
+	void	acceptConfigEntryStringDef(const std::string &name, const std::string &d);
+	void	loadConfig(std::istream &in);
 
-		ConfigEntry *getEntry(const String &name);
-		bool	haveKey(const String &name);
+	ConfigEntry *getEntry(const std::string &name);
+	bool	haveKey(const std::string &name);
 
-		// these will throw an exception if key isn't set!
-		int	getConfigInt(const String &name);
-		String &getConfigString(const String &name, String &result);
+	// these will throw an exception if key isn't set!
+	int	getConfigInt(const std::string &name);
+	std::string &getConfigString(const std::string &name, std::string &result);
 protected:
-		bool	skipWhite(Stream &in);
-		void	read(Stream &in);
+	bool	skipWhite(std::istream &in);
+	void	read(std::istream &in);
 };
-
-extern ConfigParser *gConfig;
 
 #endif

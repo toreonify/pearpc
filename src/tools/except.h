@@ -23,6 +23,9 @@
 
 #include <errno.h>		// for IOException
 
+#include <string>
+#include <sstream>
+
 #include "tools/data.h"
 #include "tools/str.h"
 
@@ -34,7 +37,7 @@ public:
 				Exception() throw();
 	virtual			~Exception();
 /* new */
-	virtual String &	reason(String &result) const;
+	virtual std::string &	reason(std::string &result) const;
 };
 
 #define MSG_EXCEPTION_MAX_ERRSTR		256
@@ -49,7 +52,7 @@ public:
 		MsgException(const char *errstr) throw();
 		MsgException() throw();
 /* new */
-	virtual	String &reason(String &result) const;
+	virtual	std::string &reason(std::string &result) const;
 };
 
 /**
@@ -65,14 +68,14 @@ public:
  */
 class IOException: public Exception {
 protected:
-	String errstr;
+	std::string errstr;
 public:
 	int mPosixErrno;
 
 		IOException(int aPosixErrno) throw();
 	virtual	~IOException();
 /* new */
-	virtual	String &reason(String &result) const;
+	virtual	std::string &reason(std::string &result) const;
 };
 
 class InternalException: public Exception {
@@ -84,11 +87,11 @@ public:
  */
 class NotImplementedException: public InternalException {
 protected:
-	String	location;
+	std::string	location;
 public:
-		NotImplementedException(const String &filename, int line_number) throw();
+		NotImplementedException(const std::string &filename, int line_number) throw();
 /* new */
-	virtual	String &reason(String &result) const;
+	virtual	std::string &reason(std::string &result) const;
 };
 
 /**
@@ -96,11 +99,11 @@ public:
  */
 class IllegalArgumentException: public InternalException {
 protected:
-	String	location;
+	std::string	location;
 public:
-		IllegalArgumentException(const String &filename, int line_number) throw();
+		IllegalArgumentException(const std::string &filename, int line_number) throw();
 /* new */
-	virtual	String &reason(String &result) const;
+	virtual	std::string &reason(std::string &result) const;
 };
 
 /**
@@ -108,11 +111,11 @@ public:
  */
 class TypeCastException: public InternalException {
 protected:
-	String	aresult;
+	std::string	aresult;
 public:
-		TypeCastException(const String &cast_type, const String &obj_type) throw();
+		TypeCastException(const std::string &cast_type, const std::string &obj_type) throw();
 /* new */
-	virtual	String &reason(String &result) const;
+	virtual	std::string &reason(std::string &result) const;
 };
 
 #endif /* __EXCEPT_H__ */
