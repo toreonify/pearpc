@@ -59,6 +59,7 @@ namespace Configuration
 		{
 			return "";
 		};
+		
 		virtual std::string getType()
 		{
 			return typeid(this->value).name();

@@ -56,5 +56,8 @@ int main (int argc, char** argv)
 		return 1;
 	}
 	
+	std::cout << "ppc_start_resolution " << config->getEntry<std::string>("ppc_start_resolution")->getValue() << std::endl;
+	std::cout << "ppc_start_full_screen " << config->getEntry<int>("ppc_start_full_screen")->getValue() << std::endl;
+	
 	return 0;
 }

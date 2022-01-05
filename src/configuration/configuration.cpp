@@ -170,10 +170,35 @@ namespace Configuration
 				}
 				
 				// Try to convert extracted value
-				std::cout << entry->getType() << std::endl;
+				if (entry->getType() == typeid(int).name())
+				{
+					if (skipSpaces)
+						throw std::invalid_argument("invalid value in line: " + line);
+					
+					errno = 0;
+					int value = std::strtol(entryValue.c_str(), NULL, 0);
+					
+					if (errno == 0)
+					{
+						((TypedEntry<int>*)entry)->setValue(value);
+					}
+					else
+					{
+						throw std::invalid_argument("invalid value in line: " + line);
+					}
+					
+					continue;
+				}
 				
-				//if (entry->getType() == "int")
-				
+				if (entry->getType() == typeid(std::string).name())
+				{
+					if (!skipSpaces)
+						throw std::invalid_argument("invalid value in line: " + line);
+					
+					((TypedEntry<std::string>*)entry)->setValue(entryValue);
+					
+					continue;
+				}
 			}
 		}
 		

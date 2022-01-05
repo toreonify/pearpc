@@ -29,6 +29,9 @@
 
 namespace Configuration
 {
+	// TODO: do we need this? maybe for config names?
+	//const char allowedCharacters[] = "abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	
 	class Configuration
 	{
 	private:
@@ -38,6 +41,22 @@ namespace Configuration
 		~Configuration();
 		
 		Entry* getEntry(std::string key);
+		template<class T> TypedEntry<T>* getEntry(std::string key)
+		{
+			std::map<std::string, Entry*>::iterator i = this->entries.find(key);
+		
+			if (i == this->entries.end())
+				return NULL;
+		
+			Entry* entry = this->entries.at(i->first);
+		
+			// Check for type
+			if (typeid(T).name() != entry->getType())
+				throw std::invalid_argument("Requested entry type doesn't equal to actual entry type");
+	
+			return (TypedEntry<T>*)entry;
+		};
+		
 		bool haveEntry(std::string& key);
 		
 		template<class T> void addEntry(const std::string name, bool mandatory, T defaultValue)
