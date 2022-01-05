@@ -4,11 +4,11 @@ bin_PROGRAMS	= ppc
 
 AM_CPPFLAGS =
 
-SUBDIRS = tools
+SUBDIRS = configuration
 
 ppc_LDFLAGS	= @PPC_LDFLAGS@
 
-ppc_LDADD = tools/libtools.a
+ppc_LDADD = configuration/libconfiguration.a
 
-ppc_SOURCES	= main.cc info.h configparser.cc configparser.h pearpc.cc pearpc.h
+ppc_SOURCES	= main.cc info.h pearpc.cc pearpc.h
 
