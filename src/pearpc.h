@@ -1,3 +1,5 @@
+#include <string>
+
 #include "configuration/configuration.hpp"
 
 class PearPC
@@ -5,10 +7,17 @@ class PearPC
 private:
 	Configuration::Configuration* configuration;
 	
-	//std::map <std::string, IODevice> ioDevices;
+	//CPU::CPU* cpu;
+	//Debug::Debugger* debugger;
+	
+	//std::map <std::string, Device*> ioDevices;
+	
 public:
 	PearPC();
 	~PearPC();
 	
 	bool initIO();
+	
+	void initializeConfigurationEntries();
+	void loadConfigurationFile(char* filePath);
 };

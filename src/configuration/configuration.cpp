@@ -55,7 +55,7 @@ namespace Configuration
 				if (line[0] == '\n' || line[0] == '\r')
 					continue;
 				
-				// Extract values
+				// Find name and value
 				int nameStart = 0;
 				bool nameStartSet = false;
 				
@@ -153,8 +153,6 @@ namespace Configuration
 				{
 					entryName = line.substr(nameStart, nameEnd - nameStart + 1);
 					entryValue = line.substr(valueStart, valueEnd - valueStart + 1);
-					
-					std::cout << entryName << " === " << entryValue << std::endl;
 				}
 				catch (std::exception& e)
 				{

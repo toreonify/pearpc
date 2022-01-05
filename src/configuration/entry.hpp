@@ -37,7 +37,7 @@ namespace Configuration
 		TypedEntry(bool mandatory) : Entry (mandatory) {};
 		~TypedEntry()
 		{
-			//delete this->value;
+			
 		};
 		
 		T getValue()
