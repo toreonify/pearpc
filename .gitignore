@@ -19,3 +19,4 @@ install-sh
 missing
 ylwrap
 *.o
+.DS_Store

@@ -3,6 +3,7 @@ PACKAGE=pearpc
 VERSION=0.6pre
 
 AC_INIT([PACKAGE],[VERSION])
+AC_LANG(C++)
 
 AC_PROG_LEX(noyywrap)
 
@@ -56,7 +57,7 @@ else
 	fi
 fi
 
-AC_CONFIG_SRCDIR([src/system/types.h])
+AC_CONFIG_SRCDIR([src/main.cpp])
 AM_INIT_AUTOMAKE(no-define)
 
 AC_CONFIG_HEADERS([config.h])
@@ -148,7 +149,7 @@ jitc_x86*)
 	CPU_DIR="cpu_jitc_x86"
 ;;	
 generic*)
-	CPU_DIR="cpu_generic"
+	CPU_DIR="generic"
 ;;	
 *)
 	CPU_DIR=""
@@ -173,14 +174,16 @@ x86_64*)
 *)
 	ARCH_DIR=generic
 	if test -z "$CPU_DIR"; then
-		CPU_DIR="cpu_generic"
+		CPU_DIR="generic"
 	fi
 ;;
 esac
 
 AC_DEFINE_UNQUOTED(SYSTEM_OSAPI_SPECIFIC_TYPES_HDR, "system/osapi/$OSAPI_DIR/types.h", [Location of system/osapi/$OSAPI_DIR/types.h])
 AC_DEFINE_UNQUOTED(SYSTEM_ARCH_SPECIFIC_FEATURES_DIR, "system/arch/$ARCH_DIR/sysfeatures.h", [Location of system/arch/$ARCH_DIR/sysfeatures.h])
-AC_DEFINE_UNQUOTED(SYSTEM_ARCH_SPECIFIC_ENDIAN_DIR, "system/arch/$ARCH_DIR/sysendian.h", [Location of system/arch/$ARCH_DIR/sysendian.h])
+AC_DEFINE_UNQUOTED(SYSTEM_ARCH_SPECIFIC_ENDIAN_DIR, "common/arch/$ARCH_DIR/endianness.h", [Location of system/arch/$ARCH_DIR/sysendian.h])
+
+AC_DEFINE_UNQUOTED(CPU_INCLUDE_DIR, "cpu/$CPU_DIR/cpu.hpp", [Location of cpu/$CPU_DIR/cpu.h])
 
 PPC_CFLAGS="$PPC_CFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -pipe";
 PPC_CXXFLAGS="$PPC_CXXFLAGS -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -pipe";
@@ -189,7 +192,7 @@ AM_CONDITIONAL(USE_OSAPI_BEOS, test x$OSAPI_DIR = xbeos)
 AM_CONDITIONAL(USE_OSAPI_POSIX, test x$OSAPI_DIR = xposix)
 AM_CONDITIONAL(USE_OSAPI_WIN32, test x$OSAPI_DIR = xwin32)
 
-AM_CONDITIONAL(USE_CPU_GENERIC, test x$CPU_DIR = xcpu_generic)
+AM_CONDITIONAL(USE_CPU_GENERIC, test x$CPU_DIR = xgeneric)
 AM_CONDITIONAL(USE_CPU_JITC_X86, test x$CPU_DIR = xcpu_jitc_x86)
 AM_CONDITIONAL(USE_CPU_JITC_X86_64, test x$CPU_DIR = xcpu_jitc_x86_64)
 
@@ -197,9 +200,8 @@ dnl Checks for programs.
 AC_PROG_RANLIB
 AC_PATH_PROGS(MAKE, gmake make, :)
 AC_PROG_MAKE_SET
-AC_PROG_CC
+AC_PROG_CXXCPP
 AC_PROG_CXX
-AC_PROG_CPP
 AM_PROG_AS
 
 AC_PROG_YACC
@@ -465,7 +467,10 @@ Makefile
 doc/Makefile
 scripts/Makefile
 src/Makefile
+src/common/Makefile
 src/configuration/Makefile
+src/cpu/Makefile
+src/cpu/generic/Makefile
 ])
 AC_OUTPUT
 

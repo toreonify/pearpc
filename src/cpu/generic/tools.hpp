@@ -18,8 +18,7 @@
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __PPC_TOOLS_H__
-#define __PPC_TOOLS_H__
+#pragma once 
 
 #include "system/types.h"
 
@@ -40,4 +39,17 @@ static inline FUNCTION_CONST uint32 ppc_word_rotl(uint32 data, int n)
 	return (data << n) | (data >> (32-n));
 }
 
-#endif
+static inline uint32 ppc_mask(int MB, int ME)
+{
+	uint32 mask;
+	if (MB <= ME) {
+		if (ME-MB == 31) {
+			mask = 0xffffffff;
+		} else {
+			mask = ((1<<(ME-MB+1))-1)<<(31-ME);
+		}
+	} else {
+		mask = ppc_word_rotl((1<<(32-MB+ME+1))-1, 31-ME);
+	}
+	return mask;
+}

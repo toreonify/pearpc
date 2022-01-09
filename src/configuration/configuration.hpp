@@ -18,8 +18,7 @@
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __CONFIGPARSER_H__
-#define __CONFIGPARSER_H__
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -72,4 +71,3 @@ namespace Configuration
 		void parseStream(std::istream& in);
 	};
 }
-#endif

@@ -1,13 +1,16 @@
+#pragma once
+
 #include <string>
 
 #include "configuration/configuration.hpp"
+#include "cpu/cpu.hpp"
 
 class PearPC
 {
 private:
 	Configuration::Configuration* configuration;
 	
-	//CPU::CPU* cpu;
+	CPU::ICPU* cpu;
 	//Debug::Debugger* debugger;
 	
 	//std::map <std::string, Device*> ioDevices;
@@ -20,4 +23,6 @@ public:
 	
 	void initializeConfigurationEntries();
 	void loadConfigurationFile(char* filePath);
+	
+	void initializeModules();
 };

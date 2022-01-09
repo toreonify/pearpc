@@ -1,10 +1,12 @@
-#include <pearpc.h>
+#include <pearpc.hpp>
 
 #include <fstream>
 
 PearPC::PearPC()
 {
 	this->configuration = new Configuration::Configuration();
+	
+	this->initializeConfigurationEntries();
 }
 
 PearPC::~PearPC()
@@ -27,7 +29,8 @@ void PearPC::initializeConfigurationEntries()
 	this->configuration->addEntry<std::string>("key_toggle_full_screen", true, std::string("Ctrl+Alt+Return"));
 	
 	// Entries from other modules
-	
+	CPU::CPU::initializeConfigurationEntries(this->configuration);
+		
 	//prom_init_config();
 	//io_init_config();
 	//ppc_cpu_init_config();
@@ -42,4 +45,9 @@ void PearPC::loadConfigurationFile(char* filePath)
 		this->configuration->parseStream(*configFile);
 
 	delete configFile;
+}
+
+void PearPC::initializeModules()
+{
+	this->cpu = (CPU::ICPU*) new CPU::CPU(this->configuration);
 }

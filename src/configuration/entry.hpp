@@ -1,5 +1,4 @@
-#ifndef __ENTRY_HPP__
-#define __ENTRY_HPP__
+#pragma once
 
 #include <string>
 #include <typeinfo>
@@ -66,5 +65,3 @@ namespace Configuration
 		};
 	};
 }
-
-#endif

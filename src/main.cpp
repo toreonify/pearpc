@@ -1,4 +1,4 @@
-#include "pearpc.h"
+#include "pearpc.hpp"
 
 PearPC* pearPcInstance;
 
@@ -13,7 +13,6 @@ int main (int argc, char** argv)
 	pearPcInstance = new PearPC();
 	
 	try {
-		pearPcInstance->initializeConfigurationEntries();
 		pearPcInstance->loadConfigurationFile(argv[1]);
 	}
 	catch (const std::exception& e)
@@ -21,6 +20,8 @@ int main (int argc, char** argv)
 		std::cout << "Configuration: " << e.what() << std::endl;
 		return 1;
 	}
+	
+	pearPcInstance->initializeModules();
 	
 	return 0;
 }

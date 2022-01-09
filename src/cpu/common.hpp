@@ -18,8 +18,7 @@
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __CPU_COMMON_H__
-#define __CPU_COMMON_H__
+#pragma once
 
 #include <stddef.h>
 #include "system/types.h"
@@ -384,6 +383,3 @@ PTE: .364
 #define HID0_nopdstm	0x00000002
 #define HID0_nopti	31
 #define HID0_noptim	0x00000001
-
-#endif
- 
